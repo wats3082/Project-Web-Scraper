@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup # this module helps in web scrapping.
 import requests  # this module helps us to download a web page
 import pandas as pd #pandas helps with data manipulation control
-
+from flask import Flask
 
 #using wikipedia that contains html with data about world populations
 url_wiki = "https://en.wikipedia.org/wiki/World_population"
@@ -28,5 +28,17 @@ for row in tables_wiki[table_index].tbody.find_all("tr"):
 
 population_data = pd.read_html(str(tables_wiki[5]), flavor='bs4')
 print (population_data)
+
+
+#now to use Flask to make a web application
+app = Flask("webScraper")
+
+@app.route('/')
+def on_load():
+    return null
+    #return 'Hello World'
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 
