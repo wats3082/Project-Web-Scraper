@@ -35,8 +35,7 @@ app = Flask("webScraper")
 
 @app.route('/')
 def on_load():
-    return null
-    #return 'Hello World'
+       return 'Hello World' #or display results use the ip address link below to view website
 
 if __name__ == "__main__":
     app.run(debug=True)
