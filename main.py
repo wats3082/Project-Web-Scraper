@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup # this module helps in web scrapping.
 import requests  # this module helps us to download a web page
 import pandas as pd #pandas helps with data manipulation control
 
+
 #using wikipedia that contains html with data about world populations
 url_wiki = "https://en.wikipedia.org/wiki/World_population"
 data_wiki = requests.get(url_wiki).text
