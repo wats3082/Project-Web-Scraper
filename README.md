@@ -1,12 +1,9 @@
 # Python and BeautifulSoup Web Scraper
 
 
-
-~~~
+<!--
 [Play Now](https://quiz-game-liart.vercel.app/)
-~~~
-
-
+-->
 
 ## Description ##
 
