@@ -19,8 +19,8 @@ https://en.wikipedia.org/wiki/World_population
 Open Command Line and input the following commands one line at a time
 
 ```
-* git clone https://github.com/wats3082/PythonRXWWebScraper.git
-* cd webScraper
+* git clone https://github.com/wats3082/Project-Web-Scraper.git
+* cd Project-Web-Scraper
 * yarn install (or npm install)
 * yarn start (or npm start)
 ```
