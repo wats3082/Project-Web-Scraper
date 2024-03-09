@@ -2,15 +2,16 @@
 
 
 
-## [Play Now](https://quiz-game-liart.vercel.app/)
+~~~
+[Play Now](https://quiz-game-liart.vercel.app/)
+~~~
+
+
 
 ## Description ##
 
-
 Web Scraping service to gather info from the WWW
-
 pulling from Wikipedia page containing top city populations of the world by area and density
-
 https://en.wikipedia.org/wiki/World_population
 
 
