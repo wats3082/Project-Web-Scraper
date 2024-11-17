@@ -60,6 +60,8 @@ pip install requests beautifulsoup4 lxml selenium webdriver-manager
 
 
 
+## web_scraper_with_error_handling.py
+
 ### Changes and Enhancements:
 
 1. **Respecting `robots.txt`:**
