@@ -1,7 +1,7 @@
 .app-shell {
   min-height: 100vh;
   margin: 0;
-  padding: 26px 16px 40px;
+  padding: 8px 16px 16px;
   color: #d1fae5;
   background:
     radial-gradient(circle at 15% -10%, rgba(16, 185, 129, 0.22) 0%, transparent 40%),
@@ -13,7 +13,7 @@
 .shell-frame {
   max-width: 1080px;
   margin: 0 auto;
-  padding: clamp(18px, 3vw, 30px);
+  padding: clamp(10px, 1.5vw, 16px);
   border: 1px solid #14532d;
   border-radius: 24px;
   background: linear-gradient(165deg, rgba(4, 27, 21, 0.95), rgba(6, 20, 17, 0.98));
@@ -21,38 +21,40 @@
 }
 
 .hero {
-  margin: 0 0 20px;
+  margin: 0 0 8px;
 }
 
 .eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: #6ee7b7;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
 }
 
 .hero h1 {
-  margin: 0 0 8px;
-  font-size: clamp(2rem, 4vw, 2.85rem);
+  margin: 0 0 4px;
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
   color: #ecfdf5;
+  line-height: 1.15;
 }
 
 .hero p {
   margin: 0;
   color: #a7f3d0;
+  font-size: 0.9rem;
 }
 
 .standard-note {
-  margin: 8px 0 0;
+  margin: 4px 0 0;
   color: #34d399;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 .top-nav {
   display: flex;
-  gap: 10px;
-  margin: 0 0 14px;
+  gap: 8px;
+  margin: 0 0 8px;
 }
 
 .nav-button {
@@ -86,16 +88,16 @@
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .kpi-card {
   position: relative;
   overflow: hidden;
   border: 1px solid #166534;
-  border-radius: 16px;
-  padding: 13px 14px;
+  border-radius: 12px;
+  padding: 7px 12px;
   background: linear-gradient(180deg, rgba(5, 36, 29, 0.95), rgba(3, 25, 20, 0.95));
 }
 
@@ -116,55 +118,56 @@
 }
 
 .kpi-value {
-  margin: 5px 0 0;
-  font-size: 1.55rem;
+  margin: 2px 0 0;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #f0fdf4;
 }
 
 .panel {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   border: 1px solid #166534;
-  border-radius: 16px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 10px 12px;
   background: linear-gradient(180deg, rgba(5, 32, 26, 0.95), rgba(4, 24, 20, 0.97));
 }
 
 .panel h2 {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 12px;
+  gap: 7px;
+  margin: 0 0 6px;
+  font-size: 1rem;
   color: #ecfdf5;
 }
 
 .panel h2::before {
   content: '';
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 999px;
   background: #34d399;
-  box-shadow: 0 0 10px rgba(52, 211, 153, 0.65);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.65);
 }
 
 .panel-subtitle {
-  margin: -4px 0 12px;
+  margin: -2px 0 8px;
   color: #86efac;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
 }
 
 .controls-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: 2fr minmax(160px, 1fr) auto;
+  gap: 8px;
+  grid-template-columns: 2fr minmax(140px, 1fr) auto;
   align-items: end;
 }
 
 .controls-grid label {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   color: #a7f3d0;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
 }
 
 input,
@@ -178,8 +181,8 @@ select,
 textarea {
   width: 100%;
   border: 1px solid #15803d;
-  border-radius: 10px;
-  padding: 9px 10px;
+  border-radius: 8px;
+  padding: 6px 9px;
   color: #ecfdf5;
   background: #07261f;
 }
@@ -198,14 +201,14 @@ textarea {
 
 button {
   border: 1px solid #10b981;
-  border-radius: 10px;
-  padding: 10px 14px;
+  border-radius: 8px;
+  padding: 7px 12px;
   background: linear-gradient(180deg, #10b981, #059669);
   color: #032c1f;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 10px 20px rgba(6, 78, 59, 0.35);
+  box-shadow: 0 8px 16px rgba(6, 78, 59, 0.35);
   transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
 }
 
@@ -241,7 +244,7 @@ table {
 th,
 td {
   text-align: left;
-  padding: 9px 10px;
+  padding: 5px 8px;
   border-bottom: 1px solid #14532d;
 }
 
@@ -286,26 +289,28 @@ td {
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 8px;
 }
 
 .content-card {
   border: 1px solid #14532d;
-  border-radius: 12px;
-  padding: 11px 12px;
+  border-radius: 10px;
+  padding: 8px 10px;
   background: rgba(4, 30, 24, 0.8);
 }
 
 .content-card h3 {
   margin: 0;
+  font-size: 0.9rem;
   color: #d1fae5;
 }
 
 ul {
-  margin: 6px 0 0;
-  padding-left: 18px;
+  margin: 4px 0 0;
+  padding-left: 16px;
   color: #a7f3d0;
-  line-height: 1.4;
+  line-height: 1.35;
+  font-size: 0.88rem;
 }
 
 .form-panel {
@@ -381,27 +386,31 @@ ul {
 
 @media (max-width: 640px) {
   .app-shell {
-    padding: 16px 10px 24px;
+    padding: 12px 10px 20px;
   }
 
   .shell-frame {
-    border-radius: 18px;
-    padding: 14px;
+    border-radius: 16px;
+    padding: 12px;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
   }
 
   .panel {
-    padding: 12px;
+    padding: 10px;
   }
 
   th,
   td {
-    padding: 8px 7px;
-    font-size: 0.9rem;
+    padding: 7px 6px;
+    font-size: 0.86rem;
   }
 
   .status-chip {
     font-size: 0.73rem;
-    padding: 2px 8px;
+    padding: 2px 7px;
   }
 
   .top-nav {
