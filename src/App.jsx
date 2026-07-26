@@ -13,6 +13,7 @@ function App() {
         <p className="eyebrow">React demo</p>
         <h1>Web Scraper Automation</h1>
         <p>Dummy data dashboard for scrape pipeline status, exports, and job activity.</p>
+        <p className="standard-note">Project standard UI shell</p>
       </header>
 
       <section className="panel">

@@ -11,3 +11,8 @@ th, td { text-align: left; padding: 10px; border-bottom: 1px solid #23344f; }
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 ul { margin: 8px 0 0; padding-left: 18px; color: #cbd5e1; }
 @media (max-width: 820px) { .split { grid-template-columns: 1fr; } }
+.standard-note {
+  margin: 8px 0 0;
+  color: #93c5fd;
+  font-size: 0.82rem;
+}
