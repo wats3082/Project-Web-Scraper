@@ -119,7 +119,7 @@ function App() {
               setNotice('')
             }}
           >
-            Add New
+            Add Entry
           </button>
         </nav>
 
@@ -220,7 +220,7 @@ function App() {
 
         {currentView === 'add-new' && (
           <section className="panel form-panel">
-            <h2>Add New</h2>
+            <h2>Add Entry</h2>
             <p className="panel-subtitle">Create a new scraper entry for this demo dataset.</p>
             <form className="entry-form" onSubmit={handleCreateEntry} noValidate>
               <label>
