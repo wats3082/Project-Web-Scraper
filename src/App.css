@@ -8,6 +8,7 @@
     radial-gradient(circle at 90% 0%, rgba(52, 211, 153, 0.12) 0%, transparent 30%),
     #04130f;
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-size: 0.9rem;
 }
 
 .shell-frame {
@@ -25,16 +26,16 @@
 }
 
 .eyebrow {
-  margin: 0 0 4px;
+  margin: 0 0 3px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: #6ee7b7;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
 }
 
 .hero h1 {
-  margin: 0 0 4px;
-  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  margin: 0 0 3px;
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
   color: #ecfdf5;
   line-height: 1.15;
 }
@@ -42,7 +43,8 @@
 .hero p {
   margin: 0;
   color: #a7f3d0;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .standard-note {
@@ -113,13 +115,14 @@
 
 .kpi-label {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   color: #86efac;
+  letter-spacing: 0.02em;
 }
 
 .kpi-value {
-  margin: 2px 0 0;
-  font-size: 1.25rem;
+  margin: 1px 0 0;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #f0fdf4;
 }
@@ -137,7 +140,9 @@
   align-items: center;
   gap: 7px;
   margin: 0 0 6px;
-  font-size: 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: #ecfdf5;
 }
 
@@ -165,9 +170,9 @@
 
 .controls-grid label {
   display: grid;
-  gap: 4px;
+  gap: 3px;
   color: #a7f3d0;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
 }
 
 input,
@@ -182,7 +187,8 @@ textarea {
   width: 100%;
   border: 1px solid #15803d;
   border-radius: 8px;
-  padding: 6px 9px;
+  padding: 5px 8px;
+  font-size: 0.84rem;
   color: #ecfdf5;
   background: #07261f;
 }
@@ -202,9 +208,10 @@ textarea {
 button {
   border: 1px solid #10b981;
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 6px 12px;
   background: linear-gradient(180deg, #10b981, #059669);
   color: #032c1f;
+  font-size: 0.84rem;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -250,12 +257,14 @@ td {
 
 th {
   color: #86efac;
-  font-size: 0.84rem;
-  letter-spacing: 0.01em;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 td {
   color: #d1fae5;
+  font-size: 0.84rem;
 }
 
 .status-chip {
@@ -301,16 +310,17 @@ td {
 
 .content-card h3 {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
   color: #d1fae5;
 }
 
 ul {
-  margin: 4px 0 0;
-  padding-left: 16px;
+  margin: 3px 0 0;
+  padding-left: 14px;
   color: #a7f3d0;
-  line-height: 1.35;
-  font-size: 0.88rem;
+  line-height: 1.3;
+  font-size: 0.8rem;
 }
 
 .form-panel {
@@ -325,9 +335,9 @@ ul {
 
 .entry-form label {
   display: grid;
-  gap: 6px;
+  gap: 5px;
   color: #a7f3d0;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
 }
 
 .entry-form .full-width {
