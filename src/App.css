@@ -425,3 +425,28 @@ ul {
     flex-direction: column;
   }
 }
+
+/* ── Desktop one-screen fit (≥769px) ─────────────────────────────────────── */
+/* Hide decorative/metadata copy that isn't critical at desktop widths.        */
+/* Both elements remain visible on mobile/tablet (≤768px).                    */
+@media (min-width: 769px) {
+  .standard-note {
+    display: none;
+  }
+
+  .panel-subtitle {
+    display: none;
+  }
+
+  .hero {
+    margin-bottom: 4px;
+  }
+
+  .kpi-grid {
+    margin-bottom: 4px;
+  }
+
+  .kpi-card {
+    padding: 5px 12px;
+  }
+}
