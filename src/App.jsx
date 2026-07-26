@@ -43,6 +43,7 @@ function App() {
 
         <section className="panel controls-panel">
           <h2>Pipeline controls</h2>
+          <p className="panel-subtitle">Tune filters and queue a demo run with the same dummy workflow.</p>
           <div className="controls-grid">
             <label>
               Source filter
@@ -62,6 +63,7 @@ function App() {
 
         <section className="panel">
           <h2>Recent scrape jobs</h2>
+          <p className="panel-subtitle">Latest job activity snapshot from the demo scraper queue.</p>
           <div className="table-wrap">
             <table>
               <thead>
