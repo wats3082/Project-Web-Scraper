@@ -2,7 +2,19 @@
 
 A portfolio data-engineering project that turns HTML sources into normalized, analysis-ready JSONL or CSV. It pairs the existing React/Vite operations dashboard with a tested Node.js extraction pipeline designed around bounded work, reproducibility, and respectful collection.
 
-**Live dashboard:** https://wats3082.github.io/Project-Web-Scraper/
+**Live interactive demo:** https://wats3082.github.io/Project-Web-Scraper/
+
+## Browser demo
+
+The GitHub Pages frontend is an explicitly simulated view of the production pipeline. Run the fixture-backed workflow to inspect:
+
+- validated configuration and bounded reliability controls;
+- crawl/policy/parse/export progress with accessible live status;
+- normalized records with per-record source and collection provenance;
+- deterministic JSONL and CSV export previews;
+- a selector-drift scenario that demonstrates explicit, safe failure.
+
+The browser never accepts arbitrary URLs and makes **zero crawl requests**. All source pages and normalized records are bundled fixture data, so the demo is reproducible and safe to host as a static site. It does not claim that browser CORS behavior or the simulation itself validates a target site's access policy. Use the Node CLI below for authorized real-world collection.
 
 ## Pipeline architecture
 
