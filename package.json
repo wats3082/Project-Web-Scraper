@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "scrape": "node src/cli.js",
+    "test": "node --test"
   },
   "dependencies": {
+    "cheerio": "^1.1.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },

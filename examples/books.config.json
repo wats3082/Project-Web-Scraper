@@ -1,0 +1,27 @@
+{
+  "startUrl": "https://books.toscrape.com/catalogue/page-1.html",
+  "maxPages": 3,
+  "userAgent": "PortfolioDataPipeline/1.0 (+https://github.com/wats3082/Project-Web-Scraper)",
+  "selectors": {
+    "items": "article.product_pod",
+    "fields": {
+      "title": { "selector": "h3 a", "attr": "title", "required": true },
+      "price": { "selector": ".price_color", "type": "number", "required": true },
+      "product_url": { "selector": "h3 a", "attr": "href", "type": "url", "required": true },
+      "availability": { "selector": ".availability" }
+    },
+    "nextPage": { "selector": "li.next a", "attr": "href" }
+  },
+  "request": {
+    "delayMs": 1000,
+    "timeoutMs": 10000,
+    "retries": 2,
+    "backoffMs": 500,
+    "maxBackoffMs": 5000,
+    "respectRobots": true
+  },
+  "output": {
+    "format": "jsonl",
+    "path": "output/books.jsonl"
+  }
+}
