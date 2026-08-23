@@ -4,8 +4,9 @@ import {
   demoConfig,
   demoPages,
   demoRecords,
+  getExportMeta,
+  getSelectorDriftDiagnostic,
   pipelineStages,
-  serializePreview,
 } from './demoData.js'
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -15,6 +16,8 @@ function Icon({ name }) {
     shield: <path d="M12 3 5 6v5c0 4.4 2.8 8.4 7 10 4.2-1.6 7-5.6 7-10V6l-7-3Zm-3 9 2 2 4-4" />,
     play: <path d="m9 7 8 5-8 5V7Z" />,
     check: <path d="m5 12 4 4L19 6" />,
+    copy: <><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3" /></>,
+    download: <path d="M12 3v12m-4-4 4 4 4-4M5 21h14" />,
     code: <path d="m8 9-4 3 4 3m8-6 4 3-4 3m-3-9-2 12" />,
     database: <><ellipse cx="12" cy="5" rx="7" ry="3" /><path d="M5 5v6c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 11v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" /></>,
     github: <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7.4A5.8 5.8 0 0 0 19.3 3 5.4 5.4 0 0 0 19.1 0S17.9-.4 15 1.5a14 14 0 0 0-6 0C6.1-.4 4.9 0 4.9 0a5.4 5.4 0 0 0-.2 3A5.8 5.8 0 0 0 3.2 7c0 5.8 3.5 7 6.8 7.4A4.8 4.8 0 0 0 9 18v4m-4-5s-2 0-3-3c0 0-1.5-1-1.5-1" />,
@@ -29,27 +32,29 @@ function App() {
   const [records, setRecords] = useState([])
   const [format, setFormat] = useState('jsonl')
   const [scenario, setScenario] = useState('success')
-  const [error, setError] = useState('')
+  const [diagnostic, setDiagnostic] = useState(null)
+  const [copyStatus, setCopyStatus] = useState('')
   const runId = useRef(0)
-  const preview = useMemo(() => serializePreview(records, format), [records, format])
+  const exportMeta = useMemo(() => getExportMeta(records, format), [records, format])
   const progress = status === 'complete' ? 100 : Math.max(0, ((stage + 1) / pipelineStages.length) * 100)
 
-  const runDemo = async () => {
+  const runDemo = async (runScenario = scenario) => {
     const id = ++runId.current
     setStatus('running')
     setStage(0)
     setPages(0)
     setRecords([])
-    setError('')
+    setDiagnostic(null)
+    setCopyStatus('')
 
     for (let index = 0; index < pipelineStages.length; index += 1) {
       if (runId.current !== id) return
       setStage(index)
       await wait(520)
 
-      if (scenario === 'selector-drift' && index === 2) {
+      if (runScenario === 'selector-drift' && index === 2) {
         setStatus('failed')
-        setError('PARSE_ERROR: No records matched selectors.items on page 1. The run stopped before export.')
+        setDiagnostic(getSelectorDriftDiagnostic(demoConfig.selectors.items))
         return
       }
       if (index === 2) {
@@ -70,7 +75,34 @@ function App() {
     setStage(-1)
     setPages(0)
     setRecords([])
-    setError('')
+    setDiagnostic(null)
+    setCopyStatus('')
+  }
+
+  const recoverDemo = () => {
+    setScenario('success')
+    runDemo('success')
+  }
+
+  const copyExport = async () => {
+    if (!exportMeta.content) return
+    try {
+      await navigator.clipboard.writeText(exportMeta.content)
+      setCopyStatus(`${format.toUpperCase()} copied to clipboard.`)
+    } catch {
+      setCopyStatus('Clipboard permission was denied. Use Download instead.')
+    }
+  }
+
+  const downloadExport = () => {
+    if (!exportMeta.content) return
+    const url = URL.createObjectURL(new Blob([exportMeta.content], { type: `${exportMeta.mime};charset=utf-8` }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = exportMeta.filename
+    link.click()
+    URL.revokeObjectURL(url)
+    setCopyStatus(`${exportMeta.filename} download started.`)
   }
 
   return (
@@ -99,7 +131,7 @@ function App() {
               parsing, normalization, provenance, and export—without making a live-site request.
             </p>
             <div className="hero-actions">
-              <button className="primary-button" type="button" onClick={runDemo} disabled={status === 'running'}>
+              <button className="primary-button" type="button" onClick={() => runDemo()} disabled={status === 'running'}>
                 <Icon name="play" /> {status === 'running' ? 'Simulation running…' : 'Run pipeline demo'}
               </button>
               {status !== 'idle' && (
@@ -149,6 +181,14 @@ function App() {
                 <span className="field-label">Robots policy</span>
                 <strong>Enforced</strong>
               </div>
+              <div>
+                <span className="field-label">Timeout</span>
+                <strong>{demoConfig.timeoutMs / 1000} sec</strong>
+              </div>
+              <div>
+                <span className="field-label">Max backoff</span>
+                <strong>{demoConfig.maxBackoffMs / 1000} sec</strong>
+              </div>
             </div>
 
             <div className="selector-block">
@@ -180,10 +220,25 @@ function App() {
               </span>
             </div>
 
-            <div className="progress-track" aria-hidden="true"><span style={{ width: `${progress}%` }} /></div>
+            <div
+              className="progress-track"
+              role="progressbar"
+              aria-label="Pipeline completion"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={Math.round(progress)}
+            >
+              <span style={{ width: `${progress}%` }} />
+            </div>
             <p className="sr-only" role="status" aria-live="polite">
-              {status === 'idle' ? 'Demo ready' : status === 'failed' ? error : `${status}. ${Math.round(progress)} percent complete.`}
+              {status === 'idle' ? 'Demo ready' : status === 'failed' ? `${diagnostic?.code ?? 'PARSE_ERROR'}: selector drift detected` : `${status}. ${Math.round(progress)} percent complete.`}
             </p>
+
+            <div className="telemetry-bar" aria-label="Current pipeline telemetry">
+              <span><b>Stage</b> {stage < 0 ? '0' : Math.min(stage + 1, pipelineStages.length)} / {pipelineStages.length}</span>
+              <span><b>Event</b> <code>{stage < 0 ? 'awaiting.run' : pipelineStages[stage].event}</code></span>
+              <span><b>Scope</b> fixture-only</span>
+            </div>
 
             <ol className="stage-list">
               {pipelineStages.map((item, index) => {
@@ -204,7 +259,23 @@ function App() {
               })}
             </ol>
 
-            {error && <div className="error-banner" role="alert"><strong>Run failed safely</strong><span>{error}</span></div>}
+            {diagnostic && (
+              <div className="error-banner" role="alert">
+                <div className="error-summary">
+                  <div>
+                    <strong>{diagnostic.code}: selector drift detected</strong>
+                    <span>Page {diagnostic.page} returned no records, so export was blocked.</span>
+                  </div>
+                  <code>{diagnostic.selector}</code>
+                </div>
+                <dl>
+                  <div><dt>Expected</dt><dd>One or more product containers</dd></div>
+                  <div><dt>Observed</dt><dd>{diagnostic.observed}</dd></div>
+                </dl>
+                <ol>{diagnostic.guidance.map((step) => <li key={step}>{step}</li>)}</ol>
+                <button className="recovery-button" type="button" onClick={recoverDemo}>Load compatible selector &amp; retry</button>
+              </div>
+            )}
 
             <div className="run-metrics" aria-label="Current run metrics">
               <div><span>Pages visited</span><strong>{pages} / {demoPages.length}</strong></div>
@@ -224,16 +295,23 @@ function App() {
             <span className="record-count">{records.length} records</span>
           </div>
 
+          <div className="provenance-strip" aria-label="Record provenance summary">
+            <div><span>Fixture snapshot</span><strong>catalog-v1</strong></div>
+            <div><span>Run ID</span><strong>demo-20260822-160000</strong></div>
+            <div><span>Collected</span><strong>2026-08-22 · 16:00 UTC</strong></div>
+            <div><span>Lineage coverage</span><strong>{records.length ? '100%' : 'Awaiting run'}</strong></div>
+          </div>
+
           <div className="table-frame">
             <table>
-              <thead><tr><th>Title</th><th>Price</th><th>Availability</th><th>Source page</th><th>Collected at</th></tr></thead>
+              <thead><tr><th>Title</th><th>Price</th><th>Availability</th><th>Source fixture</th><th>Collected at</th></tr></thead>
               <tbody>
                 {records.length ? records.map((record) => (
                   <tr key={record.product_url}>
                     <td><strong>{record.title}</strong><span className="record-url">{record.product_url}</span></td>
                     <td>${record.price.toFixed(2)}</td>
                     <td><span className="availability"><span />{record.availability}</span></td>
-                    <td><code>page-{record.source_page}.html</code></td>
+                    <td><code>{record.source_fixture}</code></td>
                     <td>{record.scraped_at.replace('T', ' ').replace('.000Z', ' UTC')}</td>
                   </tr>
                 )) : (
@@ -250,12 +328,19 @@ function App() {
             <h2>Export preview</h2>
             <p>Review the exact structured output the CLI writes downstream. Provenance fields travel with every record.</p>
             <div className="format-switch" aria-label="Export preview format">
-              <button className={format === 'jsonl' ? 'selected' : ''} type="button" onClick={() => setFormat('jsonl')}>JSONL</button>
-              <button className={format === 'csv' ? 'selected' : ''} type="button" onClick={() => setFormat('csv')}>CSV</button>
+              <button className={format === 'jsonl' ? 'selected' : ''} type="button" aria-pressed={format === 'jsonl'} onClick={() => { setFormat('jsonl'); setCopyStatus('') }}>JSONL</button>
+              <button className={format === 'csv' ? 'selected' : ''} type="button" aria-pressed={format === 'csv'} onClick={() => { setFormat('csv'); setCopyStatus('') }}>CSV</button>
             </div>
+            <div className="export-actions">
+              <button type="button" onClick={copyExport} disabled={!exportMeta.content}><Icon name="copy" /> Copy</button>
+              <button type="button" onClick={downloadExport} disabled={!exportMeta.content}><Icon name="download" /> Download</button>
+            </div>
+            <p className="export-meta" aria-live="polite">
+              {copyStatus || (exportMeta.content ? `${exportMeta.filename} · ${exportMeta.bytes.toLocaleString()} bytes · ${records.length} rows` : 'Run the demo to enable export actions.')}
+            </p>
           </div>
           <pre aria-label={`${format.toUpperCase()} export preview`}>
-            <code>{preview || `// ${format.toUpperCase()} preview appears after a successful parse`}</code>
+            <code>{exportMeta.content || `// ${format.toUpperCase()} preview appears after a successful parse`}</code>
           </pre>
         </section>
       </main>

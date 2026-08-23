@@ -10,9 +10,9 @@ The GitHub Pages frontend is an explicitly simulated view of the production pipe
 
 - validated configuration and bounded reliability controls;
 - crawl/policy/parse/export progress with accessible live status;
-- normalized records with per-record source and collection provenance;
-- deterministic JSONL and CSV export previews;
-- a selector-drift scenario that demonstrates explicit, safe failure.
+- normalized records with fixture, run, source-page, and collection provenance;
+- deterministic JSONL and CSV previews with client-only copy/download controls;
+- a selector-drift scenario with diagnosis, recovery guidance, and a fixture-safe retry.
 
 The browser never accepts arbitrary URLs and makes **zero crawl requests**. All source pages and normalized records are bundled fixture data, so the demo is reproducible and safe to host as a static site. It does not claim that browser CORS behavior or the simulation itself validates a target site's access policy. Use the Node CLI below for authorized real-world collection.
 
