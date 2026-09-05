@@ -33,11 +33,12 @@ validate -> robots policy -> rate-limited HTTP client -> CSS parser
                                JSONL / CSV export
 ```
 
-The scraper provides three cohesive capabilities:
+The scraper provides four cohesive capabilities:
 
-1. **Configuration-driven extraction:** CSS selectors define records and typed fields (`string`, `number`, or resolved `url`). Optional same-origin pagination is capped at 100 pages and rejects cycles.
-2. **Responsible, resilient collection:** `robots.txt` is checked by default, configured and robots-provided delays are honored, request timeouts are explicit, and only network failures, HTTP 429, and HTTP 5xx responses receive bounded exponential retries.
-3. **Traceable output:** Every record includes `_source_url` and `_scraped_at`; exports are machine-friendly JSONL or RFC-style escaped CSV; newline-delimited JSON events expose requests, retries, parsed-page counts, completion, and failures on stderr.
+1. **Configurable jobs:** A job has a stable lowercase `job.id`, a human-readable `job.name`, and one HTTP(S) `job.targetUrl`. Each execution reports `running`, `completed`, or `failed` status events with a structured summary or error.
+2. **Configuration-driven extraction:** Cheerio-compatible CSS selectors define records and typed fields (`string`, `number`, or resolved `url`). Optional same-origin pagination is capped at 100 pages and rejects cycles.
+3. **Responsible, resilient collection:** `robots.txt` is checked by default, configured and robots-provided delays are honored, request timeouts are explicit, and only network failures, HTTP 429, and HTTP 5xx responses receive bounded exponential retries.
+4. **Traceable output:** Every record includes `_job_id`, `_source_url`, and `_scraped_at`; exports are machine-friendly JSONL or RFC-style escaped CSV; newline-delimited JSON events expose requests, retries, job status, parsed-page counts, completion, and failures on stderr.
 
 ## Setup
 
@@ -59,15 +60,18 @@ npm run scrape -- examples/books.config.json
 
 The example targets [Books to Scrape](https://books.toscrape.com/), a sandbox intentionally published for scraping practice. Output defaults to `output/books.jsonl`; progress events are emitted separately to stderr so the data stream stays clean.
 
+New configurations use the job-oriented shape in `examples/books.config.json`. `startUrl` and `selectors` remain accepted aliases for the earlier shape, preserving existing configurations. The CLI writes a JSON job result to stdout after a successful export; operational events remain newline-delimited JSON on stderr.
+
 Key configuration controls:
 
 | Setting | Purpose |
 | --- | --- |
-| `startUrl` | First HTTP(S) page |
+| `job.id` / `job.name` | Stable job identifier and readable label |
+| `job.targetUrl` | First HTTP(S) page |
 | `maxPages` | Hard pagination ceiling, 1-100 |
-| `selectors.items` | CSS selector for each source record |
-| `selectors.fields` | Field selectors, attributes, types, and required flags |
-| `selectors.nextPage` | Optional next-link selector and attribute |
+| `extraction.items` | CSS selector for each source record |
+| `extraction.fields` | Field selectors, attributes, types, and required flags |
+| `extraction.nextPage` | Optional next-link selector and attribute |
 | `request.delayMs` | Minimum spacing between all requests |
 | `request.timeoutMs` | Per-attempt timeout |
 | `request.retries` | Retry ceiling, 0-10 |
@@ -85,11 +89,13 @@ Example field:
 }
 ```
 
-Failures return a non-zero exit code and a structured event such as:
+Failures return a non-zero exit code and structured events such as:
 
 ```json
-{"event":"pipeline.failed","code":"ROBOTS_DENIED","message":"robots.txt disallows scraping ..."}
+{"event":"job.failed","jobId":"books-catalog","status":"failed","error":{"code":"ROBOTS_DENIED","message":"robots.txt disallows scraping ..."}}
 ```
+
+`src/scraper/job.js` owns validation, status, pipeline invocation, and output delivery. The extraction pipeline stays independent of output delivery, so another output writer or future scheduler can call the same job boundary without changing selector parsing or crawl policy.
 
 ## Reliability tradeoffs
 

@@ -33,3 +33,11 @@ export class ParseError extends ScraperError {
     super(message, { code: 'PARSE_ERROR', details })
   }
 }
+
+export function errorPayload(error) {
+  return {
+    code: error?.code ?? 'UNEXPECTED_ERROR',
+    message: error?.message ?? 'An unexpected scraper error occurred',
+    ...(error?.details ? { details: error.details } : {}),
+  }
+}

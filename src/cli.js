@@ -1,9 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { validateConfig } from './scraper/config.js'
-import { exportRecords } from './scraper/exporter.js'
-import { runPipeline } from './scraper/pipeline.js'
-import { ScraperError } from './scraper/errors.js'
+import { errorPayload, ScraperError } from './scraper/errors.js'
+import { runScrapeJob } from './scraper/job.js'
 
 const configPath = process.argv[2]
 
@@ -14,18 +12,12 @@ const emit = (event, data = {}) => {
 try {
   if (!configPath) throw new ScraperError('Usage: npm run scrape -- <config.json>', { code: 'USAGE_ERROR' })
   const raw = await readFile(resolve(configPath), 'utf8')
-  const config = validateConfig(JSON.parse(raw))
-  const result = await runPipeline(config, { emit })
-  const output = await exportRecords(result.records, config.output)
-  emit('export.completed', output)
+  const result = await runScrapeJob(JSON.parse(raw), { emit })
+  process.stdout.write(`${JSON.stringify(result)}\n`)
 } catch (cause) {
   const error = cause instanceof SyntaxError
     ? new ScraperError(`Invalid JSON configuration: ${cause.message}`, { code: 'INVALID_JSON', cause })
     : cause
-  emit('pipeline.failed', {
-    code: error.code ?? 'UNEXPECTED_ERROR',
-    message: error.message,
-    details: error.details,
-  })
+  emit('pipeline.failed', errorPayload(error))
   process.exitCode = 1
 }

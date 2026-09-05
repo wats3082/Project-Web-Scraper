@@ -1,8 +1,12 @@
 {
-  "startUrl": "https://books.toscrape.com/catalogue/page-1.html",
+  "job": {
+    "id": "books-catalog",
+    "name": "Books to Scrape catalog",
+    "targetUrl": "https://books.toscrape.com/catalogue/page-1.html"
+  },
   "maxPages": 3,
   "userAgent": "PortfolioDataPipeline/1.0 (+https://github.com/wats3082/Project-Web-Scraper)",
-  "selectors": {
+  "extraction": {
     "items": "article.product_pod",
     "fields": {
       "title": { "selector": "h3 a", "attr": "title", "required": true },

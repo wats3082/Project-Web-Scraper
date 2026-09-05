@@ -32,7 +32,7 @@ export async function runPipeline(config, deps = {}) {
   const client = createHttpClient(config, { ...deps, emit })
   const startUrl = new URL(config.startUrl)
   const scrapedAt = deps.scrapedAt ?? new Date().toISOString()
-  emit('pipeline.started', { startUrl: startUrl.href, maxPages: config.maxPages })
+  emit('pipeline.started', { jobId: config.job?.id, startUrl: startUrl.href, maxPages: config.maxPages })
   const rules = await getRobots(startUrl, config, client, emit)
   client.setMinDelay(robotsDelay(rules))
 
@@ -67,6 +67,7 @@ export async function runPipeline(config, deps = {}) {
     }
     records.push(...parsed.records.map((record) => ({
       ...record,
+      ...(config.job?.id ? { _job_id: config.job.id } : {}),
       _source_url: url.href,
       _scraped_at: scrapedAt,
     })))

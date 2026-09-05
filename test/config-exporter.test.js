@@ -15,6 +15,29 @@ test('applies safe defaults and rejects unbounded page counts', () => {
   assert.throws(() => validateConfig({ ...config(), maxPages: 101 }), /maxPages/)
 })
 
+test('canonicalizes a named job configuration and rejects malformed selectors', () => {
+  const validated = validateConfig({
+    job: { id: 'catalog-import', name: 'Catalog import', targetUrl: config().startUrl },
+    extraction: config().selectors,
+  })
+
+  assert.equal(validated.job.id, 'catalog-import')
+  assert.equal(validated.targetUrl, config().startUrl)
+  assert.equal(validated.selectors.items, '.product')
+  assert.throws(
+    () => validateConfig({ job: { id: 'Bad Job', targetUrl: config().startUrl }, extraction: config().selectors }),
+    /job.id/,
+  )
+  assert.throws(
+    () => validateConfig({ job: { id: 'catalog-import', targetUrl: config().startUrl }, extraction: { ...config().selectors, items: '[' } }),
+    /valid CSS selector/,
+  )
+  assert.throws(
+    () => validateConfig({ ...config(), request: { ...config().request, respectRobots: 'yes' } }),
+    /respectRobots/,
+  )
+})
+
 test('serializes stable JSONL and escaped CSV records', () => {
   const records = [{ title: 'Alpha, "Plus"', price: 2 }, { title: 'Beta', price: null }]
 
