@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import './App.css'
 import {
   demoScrapers,
+  getDemoVariant,
   getExportMeta,
   getSelectorDriftDiagnostic,
   pipelineStages,
@@ -37,6 +38,7 @@ const statusLabel = (status) => ({
 
 function App() {
   const [activeDemoId, setActiveDemoId] = useState(demoScrapers[0].job.id)
+  const [variantIds, setVariantIds] = useState(() => Object.fromEntries(demoScrapers.map((scraper) => [scraper.job.id, scraper.variants[0].id])))
   const [runStates, setRunStates] = useState(initialStates)
   const [stages, setStages] = useState({})
   const [pagesByDemo, setPagesByDemo] = useState({})
@@ -46,7 +48,8 @@ function App() {
   const [diagnostics, setDiagnostics] = useState({})
   const [copyStatus, setCopyStatus] = useState('')
   const runId = useRef(0)
-  const activeDemo = demoScrapers.find((scraper) => scraper.job.id === activeDemoId)
+  const activeScraper = demoScrapers.find((scraper) => scraper.job.id === activeDemoId)
+  const activeDemo = getDemoVariant(activeScraper, variantIds[activeDemoId])
   const status = runStates[activeDemoId]
   const stage = stages[activeDemoId] ?? -1
   const pages = pagesByDemo[activeDemoId] ?? 0
@@ -76,10 +79,15 @@ function App() {
     setCopyStatus('')
   }
 
+  const selectVariant = (variantId) => {
+    resetDemo()
+    setVariantIds((current) => ({ ...current, [activeDemoId]: variantId }))
+    setScenario('success')
+  }
+
   const runDemo = async (scraper = activeDemo, runScenario = scenario) => {
     const id = ++runId.current
-    const demoId = scraper.job.id
-    setActiveDemoId(demoId)
+    const demoId = activeDemoId
     setRunStates((current) => ({ ...current, [demoId]: 'running' }))
     setStages((current) => ({ ...current, [demoId]: 0 }))
     setPagesByDemo((current) => ({ ...current, [demoId]: 0 }))
@@ -243,6 +251,12 @@ function App() {
                 {activeDemo.extraction.nextPage && <div><dt>next</dt><dd>{activeDemo.extraction.nextPage}</dd></div>}
               </dl>
             </div>
+
+            <label className="field-label" htmlFor="variant">Demo data source</label>
+            <select id="variant" value={variantIds[activeDemoId]} onChange={(event) => selectVariant(event.target.value)}>
+              {activeScraper.variants.map((variant) => <option key={variant.id} value={variant.id}>{variant.label}</option>)}
+            </select>
+            <p className="panel-help">Synthetic records modeled after this source category; not a live target or affiliation.</p>
 
             <label className="field-label" htmlFor="scenario">Try an outcome</label>
             <select id="scenario" value={scenario} onChange={(event) => { setScenario(event.target.value); resetDemo() }}>

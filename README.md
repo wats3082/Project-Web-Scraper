@@ -11,6 +11,7 @@ The GitHub Pages frontend is an explicitly simulated view of the production pipe
 - validated configuration and bounded reliability controls;
 - crawl/policy/parse/export progress with accessible live status;
 - normalized records with fixture, run, source-page, and collection provenance;
+- source-category dropdowns with clearly labeled synthetic records for each demo job;
 - deterministic JSONL and CSV previews with client-only copy/download controls;
 - a selector-drift scenario with diagnosis, recovery guidance, and a fixture-safe retry.
 

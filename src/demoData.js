@@ -1,5 +1,25 @@
 const timestamp = '2026-08-22T16:00:00.000Z'
 
+const createVariant = ({ id, label, source, snapshot, records, pages, driftCandidate }) => {
+  const runId = `demo-${id}-20260822-160000`
+  return {
+    id,
+    label,
+    source,
+    snapshot,
+    pages,
+    driftCandidate,
+    runId,
+    records: records.map((record, index) => ({
+      ...record,
+      source_fixture: `${snapshot}/${pages[index < pages[0].records ? 0 : 1]?.path ?? pages[0].path}`,
+      source_page: index < pages[0].records ? 1 : 2,
+      scraped_at: timestamp,
+      run_id: runId,
+    })),
+  }
+}
+
 const createDemo = ({
   id,
   name,
@@ -9,6 +29,7 @@ const createDemo = ({
   maxPages,
   delayMs,
   records,
+  variants,
   fields,
   pages,
   snapshot,
@@ -31,6 +52,7 @@ const createDemo = ({
   fields,
   pages,
   records,
+  variants,
   extraction: {
     items: itemsSelector,
     fields: Object.fromEntries(fields.map(({ key, selector }) => [key, selector])),
@@ -67,6 +89,32 @@ export const demoScrapers = [
       { title: 'Designing Observable Workflows', price: 31.75, availability: 'In stock', product_url: 'https://fixture.local/items/observable-workflows', source_fixture: 'catalog-v1/page-2.html', source_page: 2, scraped_at: timestamp, run_id: 'demo-catalog-demo-20260822-160000' },
       { title: 'Practical Data Quality', price: 26.25, availability: 'In stock', product_url: 'https://fixture.local/items/data-quality', source_fixture: 'catalog-v1/page-2.html', source_page: 2, scraped_at: timestamp, run_id: 'demo-catalog-demo-20260822-160000' },
     ],
+    variants: [
+      createVariant({
+        id: 'catalog-walmart-demo',
+        label: 'Walmart catalog sample',
+        source: 'walmart.fixture.local',
+        snapshot: 'walmart-catalog-v1',
+        pages: [{ path: 'aisle-1.html', records: 2 }],
+        driftCandidate: 'article.walmart-product-card',
+        records: [
+          { title: 'Stackable storage tote', price: 14.88, availability: 'In stock', product_url: 'https://fixture.local/walmart/storage-tote' },
+          { title: 'Compact task lamp', price: 22.4, availability: 'In stock', product_url: 'https://fixture.local/walmart/task-lamp' },
+        ],
+      }),
+      createVariant({
+        id: 'catalog-ebay-demo',
+        label: 'eBay catalog sample',
+        source: 'ebay.fixture.local',
+        snapshot: 'ebay-listings-v1',
+        pages: [{ path: 'search.html', records: 2 }],
+        driftCandidate: 'li.ebay-listing-card',
+        records: [
+          { title: 'Vintage brass desk lamp', price: 42, availability: '1 available', product_url: 'https://fixture.local/ebay/brass-desk-lamp' },
+          { title: 'Mechanical keyboard, compact', price: 58.5, availability: '3 available', product_url: 'https://fixture.local/ebay/compact-keyboard' },
+        ],
+      }),
+    ],
   }),
   createDemo({
     id: 'article-demo',
@@ -90,6 +138,56 @@ export const demoScrapers = [
       { headline: 'Tracing a production incident', author: 'A. Rivera', published: '2026-08-19', article_url: 'https://fixture.local/articles/production-incident', source_fixture: 'articles-v2/index.html', source_page: 1, scraped_at: timestamp, run_id: 'demo-article-demo-20260822-160000' },
       { headline: 'Designing an honest retry policy', author: 'M. Chen', published: '2026-08-14', article_url: 'https://fixture.local/articles/retry-policy', source_fixture: 'articles-v2/index.html', source_page: 1, scraped_at: timestamp, run_id: 'demo-article-demo-20260822-160000' },
       { headline: 'Source provenance as a product feature', author: 'S. Patel', published: '2026-08-08', article_url: 'https://fixture.local/articles/source-provenance', source_fixture: 'articles-v2/index.html', source_page: 1, scraped_at: timestamp, run_id: 'demo-article-demo-20260822-160000' },
+    ],
+    variants: [
+      createVariant({
+        id: 'articles-international-demo',
+        label: 'International desk sample',
+        source: 'international.fixture.local',
+        snapshot: 'international-v1',
+        pages: [{ path: 'latest.html', records: 2 }],
+        driftCandidate: 'article.international-story',
+        records: [
+          { headline: 'Cross-border rail project reaches new milestone', author: 'M. Ibarra', published: '2026-08-20', article_url: 'https://fixture.local/international/rail-project' },
+          { headline: 'Regional summit publishes water-sharing framework', author: 'N. Okafor', published: '2026-08-18', article_url: 'https://fixture.local/international/water-framework' },
+        ],
+      }),
+      createVariant({
+        id: 'articles-health-demo',
+        label: 'Health desk sample',
+        source: 'health.fixture.local',
+        snapshot: 'health-v1',
+        pages: [{ path: 'latest.html', records: 2 }],
+        driftCandidate: 'article.health-story',
+        records: [
+          { headline: 'Community clinics expand preventative screenings', author: 'J. Park', published: '2026-08-21', article_url: 'https://fixture.local/health/screenings' },
+          { headline: 'A practical guide to reading food labels', author: 'R. Singh', published: '2026-08-17', article_url: 'https://fixture.local/health/food-labels' },
+        ],
+      }),
+      createVariant({
+        id: 'articles-politics-demo',
+        label: 'Politics desk sample',
+        source: 'politics.fixture.local',
+        snapshot: 'politics-v1',
+        pages: [{ path: 'latest.html', records: 2 }],
+        driftCandidate: 'article.politics-story',
+        records: [
+          { headline: 'City council publishes draft transit budget', author: 'E. Morgan', published: '2026-08-22', article_url: 'https://fixture.local/politics/transit-budget' },
+          { headline: 'Voter guide explains the autumn ballot', author: 'D. Lewis', published: '2026-08-16', article_url: 'https://fixture.local/politics/voter-guide' },
+        ],
+      }),
+      createVariant({
+        id: 'articles-weather-demo',
+        label: 'Weather desk sample',
+        source: 'weather.fixture.local',
+        snapshot: 'weather-v1',
+        pages: [{ path: 'latest.html', records: 2 }],
+        driftCandidate: 'article.weather-story',
+        records: [
+          { headline: 'Weekend forecast calls for clear skies', author: 'K. Torres', published: '2026-08-22', article_url: 'https://fixture.local/weather/weekend-forecast' },
+          { headline: 'How the seasonal rainfall outlook is made', author: 'P. Ahmed', published: '2026-08-15', article_url: 'https://fixture.local/weather/rainfall-outlook' },
+        ],
+      }),
     ],
   }),
   createDemo({
@@ -119,12 +217,50 @@ export const demoScrapers = [
       { event: 'Data quality clinic', date: '2026-09-18', venue: 'Studio 4', registration_url: 'https://fixture.local/events/data-quality', source_fixture: 'events-v1/page-1.html', source_page: 1, scraped_at: timestamp, run_id: 'demo-event-demo-20260822-160000' },
       { event: 'Observability office hours', date: '2026-09-24', venue: 'Online', registration_url: 'https://fixture.local/events/observability-office-hours', source_fixture: 'events-v1/page-2.html', source_page: 2, scraped_at: timestamp, run_id: 'demo-event-demo-20260822-160000' },
     ],
+    variants: [
+      createVariant({
+        id: 'events-technology-demo',
+        label: 'Technology events sample',
+        source: 'technology-events.fixture.local',
+        snapshot: 'technology-events-v1',
+        pages: [{ path: 'calendar.html', records: 2 }],
+        driftCandidate: 'article.technology-event',
+        records: [
+          { event: 'Open source maintainer clinic', date: '2026-09-10', venue: 'Lab 2', registration_url: 'https://fixture.local/technology/maintainer-clinic' },
+          { event: 'Local data tools showcase', date: '2026-09-28', venue: 'Workshop Hall', registration_url: 'https://fixture.local/technology/data-tools-showcase' },
+        ],
+      }),
+      createVariant({
+        id: 'events-community-demo',
+        label: 'Community events sample',
+        source: 'community-events.fixture.local',
+        snapshot: 'community-events-v1',
+        pages: [{ path: 'calendar.html', records: 2 }],
+        driftCandidate: 'article.community-event',
+        records: [
+          { event: 'Neighborhood garden exchange', date: '2026-09-07', venue: 'Maple Park', registration_url: 'https://fixture.local/community/garden-exchange' },
+          { event: 'Public library skill share', date: '2026-09-15', venue: 'Central Library', registration_url: 'https://fixture.local/community/skill-share' },
+        ],
+      }),
+    ],
   }),
 ]
 
 export const demoConfig = demoScrapers[0]
 export const demoPages = demoConfig.pages
 export const demoRecords = demoConfig.records
+
+export function getDemoVariant(scraper, variantId = scraper.variants[0].id) {
+  const variant = scraper.variants.find((item) => item.id === variantId) ?? scraper.variants[0]
+  return {
+    ...scraper,
+    ...variant,
+    job: { id: variant.id, name: variant.label },
+    extraction: {
+      ...scraper.extraction,
+    },
+  }
+}
 
 export const pipelineStages = [
   { title: 'Validate configuration', description: 'Schema, limits, and selectors accepted', event: 'config.validated' },

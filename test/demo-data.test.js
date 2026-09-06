@@ -6,6 +6,7 @@ import {
   demoPages,
   demoRecords,
   getExportMeta,
+  getDemoVariant,
   getSelectorDriftDiagnostic,
   pipelineStages,
   serializePreview,
@@ -21,7 +22,7 @@ test('bundled demo records match the simulated crawl summary', () => {
   assert.equal(demoConfig.job.id, 'catalog-demo')
   assert.ok(demoConfig.extraction.items)
   assert.equal(demoScrapers.length, 3)
-  assert.ok(demoScrapers.every((scraper) => scraper.job.id && scraper.records.length && scraper.fields.length))
+  assert.ok(demoScrapers.every((scraper) => scraper.job.id && scraper.records.length && scraper.fields.length && scraper.variants.length))
 })
 
 test('demo export previews are deterministic and escaped', () => {
@@ -48,6 +49,18 @@ test('each demo scraper serializes its own configured field set', () => {
 
   assert.match(csv, /^headline,author,published,article_url,source_fixture/)
   assert.equal(getExportMeta(articles.records, 'csv', articles).filename, 'article-demo.csv')
+})
+
+test('demo jobs expose named fixture variants with distinct records', () => {
+  const catalog = demoScrapers.find((scraper) => scraper.job.id === 'catalog-demo')
+  const walmart = getDemoVariant(catalog, 'catalog-walmart-demo')
+  const ebay = getDemoVariant(catalog, 'catalog-ebay-demo')
+  const articles = demoScrapers.find((scraper) => scraper.job.id === 'article-demo')
+
+  assert.equal(walmart.job.name, 'Walmart catalog sample')
+  assert.equal(ebay.job.name, 'eBay catalog sample')
+  assert.notDeepEqual(walmart.records, ebay.records)
+  assert.equal(articles.variants.length, 4)
 })
 
 test('CSV preserves columns while rendering nullish edge values empty', () => {
