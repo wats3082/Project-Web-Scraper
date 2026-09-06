@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   demoConfig,
+  demoScrapers,
   demoPages,
   demoRecords,
   getExportMeta,
@@ -19,6 +20,8 @@ test('bundled demo records match the simulated crawl summary', () => {
   assert.ok(demoConfig.maxBackoffMs >= demoConfig.delayMs)
   assert.equal(demoConfig.job.id, 'catalog-demo')
   assert.ok(demoConfig.extraction.items)
+  assert.equal(demoScrapers.length, 3)
+  assert.ok(demoScrapers.every((scraper) => scraper.job.id && scraper.records.length && scraper.fields.length))
 })
 
 test('demo export previews are deterministic and escaped', () => {
@@ -39,6 +42,14 @@ test('export metadata is format-specific and byte accurate', () => {
   assert.match(csv.content, /source_fixture/)
 })
 
+test('each demo scraper serializes its own configured field set', () => {
+  const articles = demoScrapers.find((scraper) => scraper.job.id === 'article-demo')
+  const csv = serializePreview(articles.records.slice(0, 1), 'csv', articles)
+
+  assert.match(csv, /^headline,author,published,article_url,source_fixture/)
+  assert.equal(getExportMeta(articles.records, 'csv', articles).filename, 'article-demo.csv')
+})
+
 test('CSV preserves columns while rendering nullish edge values empty', () => {
   const record = { title: null, price: undefined }
   assert.match(serializePreview([record], 'csv'), /\n,,,,,,,\n$/)
@@ -53,4 +64,12 @@ test('selector drift diagnostic is actionable and deterministic', () => {
   )
   assert.match(diagnostic.observed, /0 matching nodes/)
   assert.equal(diagnostic.guidance.length, 3)
+})
+
+test('selector diagnostics describe the selected demo scraper candidate', () => {
+  const events = demoScrapers.find((scraper) => scraper.job.id === 'event-demo')
+  const diagnostic = getSelectorDriftDiagnostic(events.extraction.items, 1, events.driftCandidate)
+
+  assert.match(diagnostic.observed, /article\.event-card/)
+  assert.match(diagnostic.guidance[1], /article\.event-card/)
 })

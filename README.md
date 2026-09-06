@@ -6,7 +6,7 @@ A portfolio data-engineering project that turns HTML sources into normalized, an
 
 ## Browser demo
 
-The GitHub Pages frontend is an explicitly simulated view of the production pipeline. Run the fixture-backed workflow to inspect:
+The GitHub Pages frontend is an explicitly simulated view of the production pipeline. Choose from several fixture-backed scraper jobs to inspect:
 
 - validated configuration and bounded reliability controls;
 - crawl/policy/parse/export progress with accessible live status;
