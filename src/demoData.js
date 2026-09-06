@@ -1,15 +1,21 @@
 export const demoConfig = {
+  job: {
+    id: 'catalog-demo',
+    name: 'Catalog product collection',
+  },
   source: 'catalog-fixture.local',
   maxPages: 2,
   delayMs: 1000,
   retries: 2,
   timeoutMs: 10000,
   maxBackoffMs: 5000,
-  selectors: {
+  extraction: {
     items: 'article.product',
-    title: 'h2 a::text',
-    price: '.price::number',
-    next: 'a.next::href',
+    fields: {
+      title: 'h2 a::text',
+      price: '.price::number',
+    },
+    nextPage: 'a.next::href',
   },
 }
 

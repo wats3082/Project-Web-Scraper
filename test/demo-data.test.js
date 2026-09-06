@@ -17,6 +17,8 @@ test('bundled demo records match the simulated crawl summary', () => {
   assert.ok(pipelineStages.every((stage) => stage.event))
   assert.ok(demoConfig.timeoutMs > demoConfig.delayMs)
   assert.ok(demoConfig.maxBackoffMs >= demoConfig.delayMs)
+  assert.equal(demoConfig.job.id, 'catalog-demo')
+  assert.ok(demoConfig.extraction.items)
 })
 
 test('demo export previews are deterministic and escaped', () => {

@@ -21,6 +21,10 @@ function Icon({ name }) {
     code: <path d="m8 9-4 3 4 3m8-6 4 3-4 3m-3-9-2 12" />,
     database: <><ellipse cx="12" cy="5" rx="7" ry="3" /><path d="M5 5v6c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 11v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" /></>,
     github: <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7.4A5.8 5.8 0 0 0 19.3 3 5.4 5.4 0 0 0 19.1 0S17.9-.4 15 1.5a14 14 0 0 0-6 0C6.1-.4 4.9 0 4.9 0a5.4 5.4 0 0 0-.2 3A5.8 5.8 0 0 0 3.2 7c0 5.8 3.5 7 6.8 7.4A4.8 4.8 0 0 0 9 18v4m-4-5s-2 0-3-3c0 0-1.5-1-1.5-1" />,
+    terminal: <><path d="m5 7 4 4-4 4m6 1h6" /><rect x="3" y="4" width="18" height="16" rx="2" /></>,
+    arrow: <path d="M5 12h13m-5-5 5 5-5 5" />,
+    reset: <path d="M20 11a8.1 8.1 0 1 0 .1 2M20 4v7h-7" />,
+    lock: <><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></>,
   }
   return <svg aria-hidden="true" className="icon" viewBox="0 0 24 24">{paths[name]}</svg>
 }
@@ -37,6 +41,7 @@ function App() {
   const runId = useRef(0)
   const exportMeta = useMemo(() => getExportMeta(records, format), [records, format])
   const progress = status === 'complete' ? 100 : Math.max(0, ((stage + 1) / pipelineStages.length) * 100)
+  const stageEvent = stage < 0 ? 'awaiting.run' : pipelineStages[stage].event
 
   const runDemo = async (runScenario = scenario) => {
     const id = ++runId.current
@@ -54,7 +59,7 @@ function App() {
 
       if (runScenario === 'selector-drift' && index === 2) {
         setStatus('failed')
-        setDiagnostic(getSelectorDriftDiagnostic(demoConfig.selectors.items))
+        setDiagnostic(getSelectorDriftDiagnostic(demoConfig.extraction.items))
         return
       }
       if (index === 2) {
@@ -77,11 +82,6 @@ function App() {
     setRecords([])
     setDiagnostic(null)
     setCopyStatus('')
-  }
-
-  const recoverDemo = () => {
-    setScenario('success')
-    runDemo('success')
   }
 
   const copyExport = async () => {
@@ -107,138 +107,127 @@ function App() {
 
   return (
     <div className="app-shell">
-      <a className="skip-link" href="#demo">Skip to demo</a>
+      <a className="skip-link" href="#workspace">Skip to workspace</a>
       <header className="site-header">
         <a className="brand" href="./" aria-label="Pipeline Studio home">
           <span className="brand-mark"><Icon name="database" /></span>
           <span>Pipeline Studio</span>
         </a>
         <div className="header-actions">
-          <span className="simulation-label"><span className="pulse" /> Fixture simulation</span>
+          <span className="mode-label"><span className="mode-dot" /> Safe fixture demo</span>
           <a className="github-link" href="https://github.com/wats3082/Project-Web-Scraper" target="_blank" rel="noreferrer">
-            <Icon name="github" /> View source
+            <Icon name="github" /><span>Source code</span>
           </a>
         </div>
       </header>
 
-      <main id="demo">
+      <main>
         <section className="hero">
-          <div>
-            <p className="eyebrow">Data engineering portfolio</p>
-            <h1>From HTML to trusted data,<br /><span>with every step visible.</span></h1>
-            <p className="hero-copy">
-              Explore a deterministic crawl using bundled catalog fixtures. See policy checks,
-              parsing, normalization, provenance, and export—without making a live-site request.
+          <div className="hero-copy">
+            <p className="hero-overline">A transparent scraper pipeline</p>
+            <h1>Collect web data<br />with a <em>clear trail.</em></h1>
+            <p>
+              Follow a fully deterministic catalog run from validated extraction rules to
+              provenance-rich records. This hosted experience only uses bundled fixtures.
             </p>
             <div className="hero-actions">
               <button className="primary-button" type="button" onClick={() => runDemo()} disabled={status === 'running'}>
-                <Icon name="play" /> {status === 'running' ? 'Simulation running…' : 'Run pipeline demo'}
+                <Icon name="play" />{status === 'running' ? 'Running fixture demo...' : 'Run the fixture demo'}
               </button>
-              {status !== 'idle' && (
-                <button className="secondary-button" type="button" onClick={resetDemo}>Reset</button>
-              )}
+              <a className="text-link" href="#cli"><Icon name="terminal" /> Use the real CLI <Icon name="arrow" /></a>
             </div>
           </div>
-          <aside className="trust-card" aria-label="Demo safety guarantees">
-            <div className="trust-icon"><Icon name="shield" /></div>
+          <div className="hero-proof" aria-label="Demo scope">
+            <span className="proof-mark"><Icon name="shield" /></span>
             <div>
-              <strong>Safe by design</strong>
-              <p>No arbitrary URLs, credentials, or browser-side scraping. The production CLI remains separate.</p>
+              <strong>Nothing leaves your browser</strong>
+              <p>0 live requests · no arbitrary URLs · bundled catalog data only</p>
             </div>
-          </aside>
+          </div>
         </section>
 
-        <section className="workspace" aria-label="Pipeline demo workspace">
-          <aside className="config-panel">
-            <div className="section-heading">
+        <nav className="workflow-nav" aria-label="Demo steps">
+          <a href="#configuration"><span>01</span>Review the job</a>
+          <a href="#execution"><span>02</span>Run the fixture</a>
+          <a href="#results"><span>03</span>Inspect the output</a>
+        </nav>
+
+        <section className="workspace" id="workspace" aria-label="Pipeline demo workspace">
+          <aside className="config-panel" id="configuration">
+            <div className="panel-heading">
               <div>
-                <p className="section-kicker">Input</p>
-                <h2>Run configuration</h2>
+                <p className="panel-label">Configured job</p>
+                <h2>{demoConfig.job.name}</h2>
               </div>
-              <span className="valid-chip"><Icon name="check" /> Valid</span>
+              <span className="valid-chip"><Icon name="check" /> Ready</span>
             </div>
 
-            <label className="field-label" htmlFor="fixture">Bundled source fixture</label>
-            <div className="locked-field" id="fixture">
-              <span>{demoConfig.source}</span>
-              <span className="lock-tag">LOCAL</span>
+            <div className="job-id"><span>job.id</span><code>{demoConfig.job.id}</code></div>
+            <div className="source-field">
+              <span className="field-label">Target fixture</span>
+              <strong>{demoConfig.source}</strong>
+              <span><Icon name="lock" /> Local only</span>
             </div>
 
-            <div className="config-grid">
-              <div>
-                <span className="field-label">Pages</span>
-                <strong>{demoConfig.maxPages} max</strong>
-              </div>
-              <div>
-                <span className="field-label">Rate limit</span>
-                <strong>{demoConfig.delayMs} ms</strong>
-              </div>
-              <div>
-                <span className="field-label">Retries</span>
-                <strong>{demoConfig.retries} bounded</strong>
-              </div>
-              <div>
-                <span className="field-label">Robots policy</span>
-                <strong>Enforced</strong>
-              </div>
-              <div>
-                <span className="field-label">Timeout</span>
-                <strong>{demoConfig.timeoutMs / 1000} sec</strong>
-              </div>
-              <div>
-                <span className="field-label">Max backoff</span>
-                <strong>{demoConfig.maxBackoffMs / 1000} sec</strong>
-              </div>
+            <div className="config-rule" />
+            <div className="settings-grid" aria-label="Collection controls">
+              <div><span>Pages</span><strong>{demoConfig.maxPages} max</strong></div>
+              <div><span>Delay</span><strong>{demoConfig.delayMs} ms</strong></div>
+              <div><span>Retries</span><strong>{demoConfig.retries} attempts</strong></div>
+              <div><span>Timeout</span><strong>{demoConfig.timeoutMs / 1000} sec</strong></div>
             </div>
 
-            <div className="selector-block">
-              <div className="selector-title"><Icon name="code" /> Selector map</div>
-              <code>
-                <span>items</span> {demoConfig.selectors.items}<br />
-                <span>title</span> {demoConfig.selectors.title}<br />
-                <span>price</span> {demoConfig.selectors.price}<br />
-                <span>next</span> {demoConfig.selectors.next}
-              </code>
+            <div className="extraction-map">
+              <div className="map-header"><Icon name="code" /><span>Extraction rules</span></div>
+              <dl>
+                <div><dt>items</dt><dd>{demoConfig.extraction.items}</dd></div>
+                <div><dt>title</dt><dd>{demoConfig.extraction.fields.title}</dd></div>
+                <div><dt>price</dt><dd>{demoConfig.extraction.fields.price}</dd></div>
+                <div><dt>next</dt><dd>{demoConfig.extraction.nextPage}</dd></div>
+              </dl>
             </div>
 
-            <label className="field-label" htmlFor="scenario">Demo scenario</label>
+            <label className="field-label" htmlFor="scenario">Try an outcome</label>
             <select id="scenario" value={scenario} onChange={(event) => { setScenario(event.target.value); resetDemo() }}>
               <option value="success">Successful two-page crawl</option>
               <option value="selector-drift">Selector drift error</option>
             </select>
+            <p className="panel-help">The CLI validates this same job shape before making an authorized request.</p>
           </aside>
 
-          <div className="run-panel">
+          <section className="run-panel" id="execution">
             <div className="run-topline">
               <div>
-                <p className="section-kicker">Execution</p>
-                <h2>Pipeline run</h2>
+                <p className="panel-label">Live walkthrough</p>
+                <h2>Watch the job move</h2>
               </div>
               <span className={`run-status status-${status}`}>
                 <span className="status-dot" />
-                {status === 'idle' ? 'Ready' : status === 'running' ? 'Running' : status === 'complete' ? 'Complete' : 'Stopped'}
+                {status === 'idle' ? 'Ready to run' : status === 'running' ? 'Running' : status === 'complete' ? 'Complete' : 'Needs attention'}
               </span>
             </div>
 
-            <div
-              className="progress-track"
-              role="progressbar"
-              aria-label="Pipeline completion"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow={Math.round(progress)}
-            >
-              <span style={{ width: `${progress}%` }} />
+            <div className="run-summary">
+              <div>
+                <span>Current event</span>
+                <code>{stageEvent}</code>
+              </div>
+              <div>
+                <span>Scope</span>
+                <strong>Fixture only</strong>
+              </div>
+              <div>
+                <span>Progress</span>
+                <strong>{Math.round(progress)}%</strong>
+              </div>
+            </div>
+
+            <div className="progress-track" role="progressbar" aria-label="Pipeline completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress)}>
+              <span style={{ transform: `scaleX(${progress / 100})` }} />
             </div>
             <p className="sr-only" role="status" aria-live="polite">
               {status === 'idle' ? 'Demo ready' : status === 'failed' ? `${diagnostic?.code ?? 'PARSE_ERROR'}: selector drift detected` : `${status}. ${Math.round(progress)} percent complete.`}
             </p>
-
-            <div className="telemetry-bar" aria-label="Current pipeline telemetry">
-              <span><b>Stage</b> {stage < 0 ? '0' : Math.min(stage + 1, pipelineStages.length)} / {pipelineStages.length}</span>
-              <span><b>Event</b> <code>{stage < 0 ? 'awaiting.run' : pipelineStages[stage].event}</code></span>
-              <span><b>Scope</b> fixture-only</span>
-            </div>
 
             <ol className="stage-list">
               {pipelineStages.map((item, index) => {
@@ -247,12 +236,9 @@ function App() {
                 const failed = status === 'failed' && index === stage
                 return (
                   <li className={complete ? 'stage-complete' : active ? 'stage-active' : failed ? 'stage-failed' : ''} key={item.title}>
-                    <span className="stage-marker">{complete ? <Icon name="check" /> : index + 1}</span>
-                    <div>
-                      <strong>{item.title}</strong>
-                      <span>{item.description}</span>
-                    </div>
-                    {active && <span className="active-label">In progress</span>}
+                    <span className="stage-marker">{complete ? <Icon name="check" /> : String(index + 1).padStart(2, '0')}</span>
+                    <div><strong>{item.title}</strong><span>{item.description}</span></div>
+                    {active && <span className="active-label">Working</span>}
                     {complete && <span className="complete-label">Done</span>}
                   </li>
                 )
@@ -261,72 +247,73 @@ function App() {
 
             {diagnostic && (
               <div className="error-banner" role="alert">
-                <div className="error-summary">
-                  <div>
-                    <strong>{diagnostic.code}: selector drift detected</strong>
-                    <span>Page {diagnostic.page} returned no records, so export was blocked.</span>
-                  </div>
-                  <code>{diagnostic.selector}</code>
+                <div>
+                  <strong>{diagnostic.code}: selector drift detected</strong>
+                  <p>Page {diagnostic.page} returned no records, so export remains unavailable.</p>
                 </div>
-                <dl>
-                  <div><dt>Expected</dt><dd>One or more product containers</dd></div>
-                  <div><dt>Observed</dt><dd>{diagnostic.observed}</dd></div>
-                </dl>
+                <code>{diagnostic.selector}</code>
+                <p><b>Observed:</b> {diagnostic.observed}</p>
                 <ol>{diagnostic.guidance.map((step) => <li key={step}>{step}</li>)}</ol>
-                <button className="recovery-button" type="button" onClick={recoverDemo}>Load compatible selector &amp; retry</button>
+                <button className="recovery-button" type="button" onClick={() => { setScenario('success'); runDemo('success') }}>
+                  <Icon name="reset" /> Load compatible selector and retry
+                </button>
               </div>
             )}
 
             <div className="run-metrics" aria-label="Current run metrics">
-              <div><span>Pages visited</span><strong>{pages} / {demoPages.length}</strong></div>
+              <div><span>Pages visited</span><strong>{pages} <small>/ {demoPages.length}</small></strong></div>
               <div><span>Records normalized</span><strong>{records.length}</strong></div>
               <div><span>Network requests</span><strong>0</strong></div>
             </div>
-          </div>
+          </section>
         </section>
 
-        <section className="results-section">
-          <div className="section-heading results-heading">
+        <section className="results-section" id="results">
+          <div className="results-heading">
             <div>
-              <p className="section-kicker">Output</p>
-              <h2>Normalized records</h2>
-              <p>Schema-consistent fixture data enriched with source and collection metadata.</p>
+              <p className="panel-label">Collected records</p>
+              <h2>Clean data with its context intact.</h2>
             </div>
-            <span className="record-count">{records.length} records</span>
+            {status !== 'idle' && <button className="quiet-button" type="button" onClick={resetDemo}><Icon name="reset" /> Reset demo</button>}
           </div>
 
-          <div className="provenance-strip" aria-label="Record provenance summary">
-            <div><span>Fixture snapshot</span><strong>catalog-v1</strong></div>
-            <div><span>Run ID</span><strong>demo-20260822-160000</strong></div>
-            <div><span>Collected</span><strong>2026-08-22 · 16:00 UTC</strong></div>
-            <div><span>Lineage coverage</span><strong>{records.length ? '100%' : 'Awaiting run'}</strong></div>
-          </div>
-
-          <div className="table-frame">
-            <table>
-              <thead><tr><th>Title</th><th>Price</th><th>Availability</th><th>Source fixture</th><th>Collected at</th></tr></thead>
-              <tbody>
-                {records.length ? records.map((record) => (
-                  <tr key={record.product_url}>
-                    <td><strong>{record.title}</strong><span className="record-url">{record.product_url}</span></td>
-                    <td>${record.price.toFixed(2)}</td>
-                    <td><span className="availability"><span />{record.availability}</span></td>
-                    <td><code>{record.source_fixture}</code></td>
-                    <td>{record.scraped_at.replace('T', ' ').replace('.000Z', ' UTC')}</td>
-                  </tr>
-                )) : (
-                  <tr><td className="empty-state" colSpan="5">Run the simulation to populate normalized records.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          {records.length ? (
+            <>
+              <div className="provenance-strip" aria-label="Record provenance summary">
+                <div><span>Snapshot</span><strong>catalog-v1</strong></div>
+                <div><span>Run ID</span><strong>demo-20260822-160000</strong></div>
+                <div><span>Collected</span><strong>2026-08-22 · 16:00 UTC</strong></div>
+                <div><span>Lineage</span><strong>100% complete</strong></div>
+              </div>
+              <div className="table-frame">
+                <table>
+                  <thead><tr><th>Title</th><th>Price</th><th>Availability</th><th>Source fixture</th><th>Collected at</th></tr></thead>
+                  <tbody>{records.map((record) => (
+                    <tr key={record.product_url}>
+                      <td><strong>{record.title}</strong><span className="record-url">{record.product_url}</span></td>
+                      <td>${record.price.toFixed(2)}</td>
+                      <td><span className="availability"><span />{record.availability}</span></td>
+                      <td><code>{record.source_fixture}</code></td>
+                      <td>{record.scraped_at.replace('T', ' ').replace('.000Z', ' UTC')}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className="results-empty">
+              <span className="empty-icon"><Icon name="database" /></span>
+              <div><strong>Your normalized records will appear here.</strong><p>Run the fixture demo to inspect data alongside its source, timestamp, and run context.</p></div>
+              <button className="secondary-button" type="button" onClick={() => runDemo()} disabled={status === 'running'}><Icon name="play" /> Run demo</button>
+            </div>
+          )}
         </section>
 
         <section className="export-section">
           <div className="export-copy">
-            <p className="section-kicker">Delivery</p>
-            <h2>Export preview</h2>
-            <p>Review the exact structured output the CLI writes downstream. Provenance fields travel with every record.</p>
+            <p className="panel-label">Export ready</p>
+            <h2>Take the exact output with you.</h2>
+            <p>Switch formats, inspect the bytes, then copy or download the fixture result locally.</p>
             <div className="format-switch" aria-label="Export preview format">
               <button className={format === 'jsonl' ? 'selected' : ''} type="button" aria-pressed={format === 'jsonl'} onClick={() => { setFormat('jsonl'); setCopyStatus('') }}>JSONL</button>
               <button className={format === 'csv' ? 'selected' : ''} type="button" aria-pressed={format === 'csv'} onClick={() => { setFormat('csv'); setCopyStatus('') }}>CSV</button>
@@ -335,19 +322,21 @@ function App() {
               <button type="button" onClick={copyExport} disabled={!exportMeta.content}><Icon name="copy" /> Copy</button>
               <button type="button" onClick={downloadExport} disabled={!exportMeta.content}><Icon name="download" /> Download</button>
             </div>
-            <p className="export-meta" aria-live="polite">
-              {copyStatus || (exportMeta.content ? `${exportMeta.filename} · ${exportMeta.bytes.toLocaleString()} bytes · ${records.length} rows` : 'Run the demo to enable export actions.')}
-            </p>
+            <p className="export-meta" aria-live="polite">{copyStatus || (exportMeta.content ? `${exportMeta.filename} · ${exportMeta.bytes.toLocaleString()} bytes · ${records.length} rows` : 'Run the demo to enable export.')}</p>
           </div>
-          <pre aria-label={`${format.toUpperCase()} export preview`}>
-            <code>{exportMeta.content || `// ${format.toUpperCase()} preview appears after a successful parse`}</code>
-          </pre>
+          <pre aria-label={`${format.toUpperCase()} export preview`}><code>{exportMeta.content || `// ${format.toUpperCase()} preview appears after a successful run`}</code></pre>
+        </section>
+
+        <section className="cli-section" id="cli">
+          <div><p className="panel-label">When you are ready</p><h2>Run authorized collection from the CLI.</h2></div>
+          <div className="command-line"><Icon name="terminal" /><code>npm run scrape -- examples/books.config.json</code></div>
+          <a className="text-link" href="https://github.com/wats3082/Project-Web-Scraper#usage" target="_blank" rel="noreferrer">Read the setup guide <Icon name="arrow" /></a>
         </section>
       </main>
 
       <footer>
-        <span>Built as a transparent, testable data pipeline.</span>
-        <span>Fixture data only · No live browser scraping</span>
+        <span>Configurable web-data collection with transparent safeguards.</span>
+        <span>Fixture demo · No live browser scraping</span>
       </footer>
     </div>
   )
